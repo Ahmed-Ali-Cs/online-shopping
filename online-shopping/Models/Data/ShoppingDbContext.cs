@@ -4,7 +4,7 @@ namespace online_shopping.Models.Data
 {
     public class ShoppingDbContext : DbContext
     {
-        public ShoppingDbContext(DbContextOptions options) : base(options)
+        public ShoppingDbContext(DbContextOptions<ShoppingDbContext> options) : base(options)
         {
         }
         public DbSet<Product> Products { get; set; }
