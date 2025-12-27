@@ -1,7 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using online_shopping.Models.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<ShoppingDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("onlineDbConnect")));
 
 var app = builder.Build();
 

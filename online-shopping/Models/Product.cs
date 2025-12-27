@@ -1,4 +1,7 @@
-﻿namespace online_shopping.Models
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace online_shopping.Models
 {
     public class Product
     {
@@ -10,5 +13,6 @@
         [Required]
         [Precision(16, 2)]
         public decimal Price { get; set; } = 0;
+        public int Stock { get; set; }
     }
 }
