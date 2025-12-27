@@ -7,34 +7,38 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using online_shopping.Models;
 using online_shopping.Models.Data;
+using online_shopping.Models.UnitOfWork;
 
 namespace online_shopping.Controllers
 {
     public class ProductsController : Controller
     {
+        private readonly IUnitOfWork unitOfWork;
         private readonly ShoppingDbContext _context;
 
-        public ProductsController(ShoppingDbContext context)
+        public ProductsController(IUnitOfWork unitOfWork,ShoppingDbContext context)
         {
+            this.unitOfWork = unitOfWork;
             _context = context;
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Products.ToListAsync());
+            var product = unitOfWork.Product.GetAll();
+            return View(product);
         }
 
         // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = unitOfWork.Product.Get(m => m.Id == id);
+                
             if (product == null)
             {
                 return NotFound();
@@ -54,26 +58,27 @@ namespace online_shopping.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,Stock")] Product product)
+        public IActionResult Create(Product product)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                unitOfWork.Product.Add(product);
+                unitOfWork.Save();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
 
         // GET: Products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = unitOfWork.Product.Get(p => p.Id == id);
+            unitOfWork.Save();
             if (product == null)
             {
                 return NotFound();
@@ -86,19 +91,15 @@ namespace online_shopping.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Stock")] Product product)
+        public IActionResult Edit(Product product)
         {
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
-
+            
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    unitOfWork.Product.Update(product);
+                    unitOfWork.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -117,15 +118,15 @@ namespace online_shopping.Controllers
         }
 
         // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = unitOfWork.Product.Get(m => m.Id == id);
+               
             if (product == null)
             {
                 return NotFound();

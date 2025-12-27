@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using online_shopping.Models.Data;
+using online_shopping.Models.UnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<ShoppingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("onlineDbConnect")));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 

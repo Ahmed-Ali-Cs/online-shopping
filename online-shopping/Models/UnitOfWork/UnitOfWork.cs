@@ -13,5 +13,10 @@ namespace online_shopping.Models.UnitOfWork
             this.db = db;
             Product=new ProductRepository(db);
         }
+
+        public void Save()
+        {
+            db.SaveChanges();
+        }
     }
 }
