@@ -14,12 +14,12 @@ namespace online_shopping.Controllers
     public class ProductsController : Controller
     {
         private readonly IUnitOfWork unitOfWork;
-        private readonly ShoppingDbContext _context;
 
-        public ProductsController(IUnitOfWork unitOfWork,ShoppingDbContext context)
+
+        public ProductsController(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
-            _context = context;
+
         }
 
         // GET: Products
@@ -38,7 +38,7 @@ namespace online_shopping.Controllers
             }
 
             var product = unitOfWork.Product.Get(m => m.Id == id);
-                
+
             if (product == null)
             {
                 return NotFound();
@@ -62,21 +62,18 @@ namespace online_shopping.Controllers
         {
             if (ModelState.IsValid)
             {
+
                 unitOfWork.Product.Add(product);
                 unitOfWork.Save();
+                TempData["Success"] = "The Product has been Created Successfully";
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
 
         // GET: Products/Edit/5
-        public IActionResult Edit(int? id)
+        public IActionResult Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var product = unitOfWork.Product.Get(p => p.Id == id);
             unitOfWork.Save();
             if (product == null)
@@ -93,40 +90,25 @@ namespace online_shopping.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Product product)
         {
-            
+
             if (ModelState.IsValid)
             {
-                try
-                {
-                    unitOfWork.Product.Update(product);
-                    unitOfWork.Save();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
+                unitOfWork.Product.Update(product);
+                unitOfWork.Save();
+                TempData["Success"] = "The Product has been Updated Successfully";
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
         }
 
         // GET: Products/Delete/5
-        public IActionResult Delete(int? id)
+        public IActionResult Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+           
 
             var product = unitOfWork.Product.Get(m => m.Id == id);
-               
+
             if (product == null)
             {
                 return NotFound();
@@ -143,22 +125,11 @@ namespace online_shopping.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    unitOfWork.Product.Update(product);
-                    unitOfWork.Save();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
+                unitOfWork.Product.Delete(product);
+                unitOfWork.Save();
+
+                TempData["Success"] = "The Product has been Deleted Successfully";
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -175,9 +146,9 @@ namespace online_shopping.Controllers
         //    return RedirectToAction(nameof(Index));
         //}
 
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
-        }
+        //private bool ProductExists(int id)
+        //{
+        //    return unitOfWork.Product.Any(e => e.Id == id);
+        //}
     }
 }
